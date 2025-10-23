@@ -22,6 +22,7 @@ Then(/^the search results should include the product "([^\"]*)"$/, async (produc
   const product = await $('[data-test="product-name"]');
   await product.waitForDisplayed({ timeout: 10000 });
 
+  
   const productText = (await product.getText()).trim();
   expect(productText).to.contain(productName);
   productText.should.include(productName);
