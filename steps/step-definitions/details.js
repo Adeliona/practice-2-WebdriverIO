@@ -1,6 +1,6 @@
 import { Given, When, Then } from "@wdio/cucumber-framework";
 import { should } from 'chai';
-should();  // Initialize Should style
+should();
 
 
 When(/^the user clicks on a product name or image$/, async () => {

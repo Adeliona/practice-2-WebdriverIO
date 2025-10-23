@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@wdio/cucumber-framework";
-import { expect as chaiExpect } from 'chai';
+import { expect } from 'chai';
 import { registerNewUser } from "../../utils/helper.js";
 
 Given(/^the user is on the login page$/, async () => {
@@ -10,14 +10,6 @@ Given(/^the user is on the login page$/, async () => {
 
 When(/^the user logs in with a valid username and password$/, async () => {
   const { email, password } = await registerNewUser();
-  
-  // await browser.waitUntil(
-  //   async () => {
-  //     const state = await browser.execute(() => document.readyState);
-  //     return state === 'complete';
-  //   },
-  //   { timeout: 15000, timeoutMsg: 'Page is not fully loaded' }
-  // );
 
   await browser.pause(2000);
 
@@ -44,7 +36,7 @@ Then(/^the user should be redirected to their profile page$/, async () => {
   );
   
   const currentUrl = await browser.getUrl();
-  chaiExpect(currentUrl.toLowerCase()).to.include("account", "URL should contain 'account' after login");
+  expect(currentUrl.toLowerCase()).to.include("account", "URL should contain 'account' after login");
 });
 
 Then(/^the profile page should display the user's account$/, async () => {
@@ -52,5 +44,5 @@ Then(/^the profile page should display the user's account$/, async () => {
   await pageTitle.waitForDisplayed({ timeout: 10000 });
 
   const titleText = await pageTitle.getText();
-  chaiExpect(titleText).to.include("My account", "Page title should contain 'My account'");
+  expect(titleText).to.include("My account", "Page title should contain 'My account'");
 });
