@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@wdio/cucumber-framework";
-import { expect } from "@wdio/globals";
+import { assert } from 'chai';
 
 
 When(
@@ -22,7 +22,7 @@ Then(
   async () => {
     const nav = await $("nav");
     const navText = (await nav.getText()).toLowerCase();
-    expect(navText).toContain("start");
+    assert.include(navText, "start", "Navigation should contain 'start' text");
   }
 );
 
@@ -31,6 +31,6 @@ Then(
   async () => {
     const nav = await $("nav");
     const navText = (await nav.getText()).toLowerCase();
-    expect(navText).toMatch(/produkte|kontakt|über/);
+    assert.match(navText, /produkte|kontakt|über/, "Navigation should contain German labels");
   }
 );

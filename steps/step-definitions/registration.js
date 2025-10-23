@@ -1,4 +1,5 @@
 import { Given, When, Then } from "@wdio/cucumber-framework";
+import { assert } from 'chai';
 import { generateUniqueEmail, generatePassword } from "../../utils/helper.js";
 
 let email, password;
@@ -40,5 +41,6 @@ Then(/^the login form should be displayed$/, async () => {
     { timeout: 10000 }
   );
   await browser.pause(1000);
-  expect(await $(".auth-form").isDisplayed()).toBe(true);
+  const isFormDisplayed = await $(".auth-form").isDisplayed();
+  assert.isTrue(isFormDisplayed, "Login form should be visible after registration");
 });

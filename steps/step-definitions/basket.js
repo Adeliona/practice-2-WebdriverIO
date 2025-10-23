@@ -1,5 +1,6 @@
 import { Given, When, Then } from "@wdio/cucumber-framework";
-import { expect, $ } from "@wdio/globals";
+import { $ } from "@wdio/globals";
+import { assert } from "chai";
 
 let selectedProductName;
 
@@ -9,7 +10,7 @@ Given(/^the user is on the product listing page$/, async () => {
 
   const productCard = $(".card-title");
   await productCard.waitForDisplayed({ timeout: 5000 });
-  await browser.pause(1000);
+  await productCard.waitForClickable({ timeout: 2000 });
 });
 
 When(/^the user clicks on a product name$/, async () => {
@@ -19,11 +20,15 @@ When(/^the user clicks on a product name$/, async () => {
   selectedProductName = (await firstProduct.getText()).trim();
 
   await firstProduct.click();
+  await browser.waitUntil(
+    async () => (await browser.getUrl()).includes("/product/"),
+    { timeout: 5000, timeoutMsg: "Product page did not open after click" }
+  );
 });
 
 When(/^the user adds the product to the basket$/, async () => {
   const addToBasketBtn = $("#btn-add-to-cart");
-  await addToBasketBtn.waitForDisplayed({ timeout: 5000 });
+  await addToBasketBtn.waitForDisplayed({ timeout: 10000 });
   await addToBasketBtn.click();
 
   const basketAlert = $('[role="alert"]');
@@ -41,7 +46,7 @@ When(/^the user navigates to the basket$/, async () => {
   );
 
   const currentUrl = await browser.getUrl();
-  expect(currentUrl).toContain("/checkout");
+  assert.include(currentUrl, "/checkout", "URL should contain checkout path");
 });
 
 Then(
@@ -51,6 +56,10 @@ Then(
     await basketProduct.waitForDisplayed({ timeout: 10000 });
     const basketProductName = (await basketProduct.getText()).trim();
 
-    expect(basketProductName).toContain(selectedProductName);
+    assert.include(
+      basketProductName,
+      selectedProductName,
+      "Basket should contain the selected product name"
+    );
   }
 );

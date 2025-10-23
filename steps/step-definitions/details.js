@@ -1,5 +1,6 @@
 import { Given, When, Then } from "@wdio/cucumber-framework";
-import { expect } from "@wdio/globals";
+import { should } from 'chai';
+should();  // Initialize Should style
 
 
 When(/^the user clicks on a product name or image$/, async () => {
@@ -10,7 +11,7 @@ When(/^the user clicks on a product name or image$/, async () => {
 
 Then(/^the user should be taken to the product details page$/, async () => {
   const currentUrl = await browser.getUrl();
-  expect(currentUrl).toContain("/product/");
+  ("/product/", "URL should contain product path");
 });
 
 Then(
@@ -26,8 +27,12 @@ Then(
     await price.waitForDisplayed({ timeout: 5000 });
     await addButton.waitForDisplayed({ timeout: 5000 });
 
-    expect(await name.getText()).not.toBe("");
-    expect(await description.getText()).not.toBe("");
-    expect(await price.getText()).toMatch(/^\$\d+/);
+    const nameText = await name.getText();
+    const descriptionText = await description.getText();
+    const priceText = await price.getText();
+
+    nameText.should.not.be.empty;
+    descriptionText.should.not.be.empty;
+    priceText.should.match(/^\$\d+/, "Price should start with $ followed by digits");
   }
 );

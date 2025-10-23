@@ -1,6 +1,8 @@
 import { Given, When, Then, Before } from "@wdio/cucumber-framework";
-import { expect } from "@wdio/globals";
+import { should } from 'chai';
 import { loginUser, newPhone, newName } from "../../utils/helper.js";
+
+should();
 
 let generatedPhone;
 let generatedName;
@@ -21,7 +23,9 @@ When(/^the user updates their display name and phone number$/, async () => {
 
   const nameField = await $("#first_name");
   const phoneField = await $("#phone");
+
   await browser.pause(1000);
+  
   await nameField.clearValue();
   await nameField.setValue(generatedName);
 
@@ -41,7 +45,7 @@ Then(
     const successAlert = await $(".alert-success");
     await successAlert.waitForDisplayed({ timeout: 5000 });
     const text = await successAlert.getText();
-    expect(text).toContain(expectedMessage);
+    text.should.include(expectedMessage, "Success message should contain expected text");
   }
 );
 
@@ -67,7 +71,7 @@ Then(
     const nameValue = await $("#first_name").getValue();
     const phoneValue = await $("#phone").getValue();
 
-    expect(nameValue).toBe(generatedName);
-    expect(phoneValue).toBe(generatedPhone);
+    nameValue.should.equal(generatedName, "Name field should contain the new value");
+    phoneValue.should.equal(generatedPhone, "Phone field should contain the new value");
   }
 );

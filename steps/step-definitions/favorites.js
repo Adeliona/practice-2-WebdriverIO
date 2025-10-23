@@ -1,5 +1,5 @@
 import { Given, When, Then, Before } from "@wdio/cucumber-framework";
-import { expect } from "@wdio/globals";
+import { expect as chaiExpect } from 'chai';
 import { loginUser } from "../../utils/helper.js";
 
 Before({ tags: "@loginFavorites" }, async () => {
@@ -16,9 +16,12 @@ Given(
     await productLink.waitForDisplayed({ timeout: 5000 });
     await productLink.click();
 
-    await browser.pause(1000);
+    await browser.waitUntil(
+      async () => (await browser.getUrl()).includes("/product/"),
+      { timeout: 5000, timeoutMsg: "Product details page did not load" }
+    );
     const currentUrl = await browser.getUrl();
-    expect(currentUrl).toContain("/product/");
+    chaiExpect(currentUrl).to.include("/product/", "URL should contain product path");
   }
 );
 
@@ -50,6 +53,6 @@ Then(
     await favoriteProductTitle.waitForDisplayed({ timeout: 5000 });
 
     const favoriteProductName = (await favoriteProductTitle.getText()).trim();
-    expect(favoriteProductName).toBe(productName);
+    chaiExpect(favoriteProductName).to.equal(productName, "Product should be in favorites list");
   }
 );

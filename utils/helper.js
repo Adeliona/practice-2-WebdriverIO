@@ -10,7 +10,7 @@ export function generatePassword() {
 }
 
 export function newPhone(length = 8) {
-  return `+380${Math.floor(100000000 + Math.random() * 900000000)}`;
+  return `380${Math.floor(100000000 + Math.random() * 900000000)}`;
 }
 
 export function newName(length = 8) {
@@ -21,6 +21,7 @@ export async function registerNewUser() {
   await browser.url("/auth/register");
   const email = generateUniqueEmail();
   const password = generatePassword();
+  const phoneNumber = newPhone();
 
   await $("#first_name").setValue("John");
   await $("#last_name").setValue("Doe");
@@ -30,7 +31,7 @@ export async function registerNewUser() {
   await $("#city").setValue("Kyiv");
   await $("#state").setValue("Kyiv Region");
   await $("#country").selectByVisibleText("Ukraine");
-  await $("#phone").setValue("123456789");
+  await $("#phone").setValue(phoneNumber);
   await $("#email").setValue(email);
   await $("#password").setValue(password);
   await $('button[type="submit"]').click();
@@ -46,7 +47,7 @@ export async function loginUser() {
   await browser.pause(1000);
 
   await browser.url("/auth/login");
-
+  await browser.pause(1000);
   const emailField = await $("#email");
   await emailField.waitForDisplayed({ timeout: 5000 });
   await emailField.setValue(email);
@@ -57,6 +58,8 @@ export async function loginUser() {
 
   const submitButton = await $('input[data-test="login-submit"]');
   await submitButton.waitForClickable({ timeout: 5000 });
+  await browser.pause(1000);
+
   await submitButton.click();
 
   await browser.waitUntil(
