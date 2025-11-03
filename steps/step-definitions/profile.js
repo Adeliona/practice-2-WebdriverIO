@@ -1,77 +1,62 @@
 import { Given, When, Then, Before } from "@wdio/cucumber-framework";
 import { should } from 'chai';
 import { loginUser, newPhone, newName } from "../../utils/helper.js";
+import { ProfilePage } from '../../page-objects/ProfilePage.js';
 
 should();
 
+const profilePage = new ProfilePage();
 let generatedPhone;
 let generatedName;
 
 Before({ tags: "@loginProfile" }, async () => {
-  await loginUser();
-  await browser.pause(1000);
+    await loginUser();
+    await browser.pause(1000);
 });
 
 Given(/^the user is logged in and on the profile page$/, async () => {
-  await browser.url("/account/profile");
-  await $("#first_name").waitForDisplayed({ timeout: 5000 });
+    await profilePage.navigateToProfile();
 });
 
 When(/^the user updates their display name and phone number$/, async () => {
-  generatedPhone = newPhone();
-  generatedName = newName();
+    generatedPhone = newPhone();
+    generatedName = newName();
 
-  const nameField = await $("#first_name");
-  const phoneField = await $("#phone");
-
-  await browser.pause(1000);
-  
-  await nameField.clearValue();
-  await nameField.setValue(generatedName);
-
-  await phoneField.clearValue();
-  await phoneField.setValue(generatedPhone);
+    await browser.pause(2000); // Wait for the page to be fully loaded
+    
+    await profilePage.updateProfileName(generatedName);
+    await profilePage.updateProfilePhone(generatedPhone);
 });
 
 When(/^saves the profile changes$/, async () => {
-  const saveButton = await $('button[type="submit"]');
-  await saveButton.waitForClickable({ timeout: 5000 });
-  await saveButton.click();
+    await profilePage.saveChanges();
 });
 
-Then(
-  /^the page should show the message "([^\"]*)"$/,
-  async (expectedMessage) => {
-    const successAlert = await $(".alert-success");
-    await successAlert.waitForDisplayed({ timeout: 5000 });
-    const text = await successAlert.getText();
-    text.should.include(expectedMessage, "Success message should contain expected text");
-  }
-);
+Then(/^the page should show the message "([^\"]*)"$/, async (expectedMessage) => {
+    const message = await profilePage.getSuccessMessage();
+    message.should.include(expectedMessage, "Success message should contain expected text");
+});
 
-Then(
-  /^the updated name and phone number should be visible on the profile page$/,
-  async () => {
+Then(/^the updated name and phone number should be visible on the profile page$/, async () => {
     await browser.waitUntil(
-      async () => (await $("#first_name").getValue()) === generatedName,
-      {
-        timeout: 10000,
-        timeoutMsg: "Name field did not update with the new value",
-      }
+        async () => (await profilePage.getCurrentName()) === generatedName,
+        {
+            timeout: 10000,
+            timeoutMsg: "Name field did not update with the new value",
+        }
     );
 
     await browser.waitUntil(
-      async () => (await $("#phone").getValue()) === generatedPhone,
-      {
-        timeout: 10000,
-        timeoutMsg: "Phone field did not update with the new value",
-      }
+        async () => (await profilePage.getCurrentPhone()) === generatedPhone,
+        {
+            timeout: 10000,
+            timeoutMsg: "Phone field did not update with the new value",
+        }
     );
 
-    const nameValue = await $("#first_name").getValue();
-    const phoneValue = await $("#phone").getValue();
+    const nameValue = await profilePage.getCurrentName();
+    const phoneValue = await profilePage.getCurrentPhone();
 
     nameValue.should.equal(generatedName, "Name field should contain the new value");
     phoneValue.should.equal(generatedPhone, "Phone field should contain the new value");
-  }
-);
+});
