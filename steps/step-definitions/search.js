@@ -1,5 +1,5 @@
 import { Given, When, Then } from "@wdio/cucumber-framework";
-import {should, expect, assert } from "chai";
+import { should, expect, assert } from "chai";
 
 should();
 
@@ -21,6 +21,7 @@ When(/^the user searches for "([^\"]*)" in the search bar$/, async (productName)
 Then(/^the search results should include the product "([^\"]*)"$/, async (productName) => {
   const product = await $('[data-test="product-name"]');
   await product.waitForDisplayed({ timeout: 10000 });
+
 
   const productText = (await product.getText()).trim();
   expect(productText).to.contain(productName);
